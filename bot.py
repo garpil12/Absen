@@ -1,0 +1,336 @@
+import asyncio
+import sqlite3
+import os
+from datetime import datetime, timedelta
+from telethon import TelegramClient, events, Button
+import pytz
+from dotenv import load_dotenv
+from jobdast import register_jobdast_handlers
+# ======================
+# ENV
+# ======================
+load_dotenv()
+
+api_id = int(os.getenv("API_ID"))
+api_hash = os.getenv("API_HASH")
+bot_token = os.getenv("BOT_TOKEN")
+OWNER_ID = int(os.getenv("OWNER_ID"))
+
+client = TelegramClient("absenhyperion", api_id, api_hash).start(bot_token=bot_token)
+WIB = pytz.timezone("Asia/Jakarta")
+register_jobdast_handlers(client)
+# ======================
+# DATABASE
+# ======================
+db = sqlite3.connect("absen.db", check_same_thread=False)
+cur = db.cursor()
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS absensi (
+group_id INTEGER,
+user_id INTEGER,
+nama TEXT,
+status TEXT,
+alasan TEXT,
+waktu TEXT,
+tanggal TEXT
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS rekap (
+group_id INTEGER,
+tanggal TEXT,
+hadir INTEGER,
+izin INTEGER,
+sakit INTEGER
+)
+""")
+db.commit()
+
+# ======================
+# MEMORY
+# ======================
+pending_izin = {}
+absen_msg = {}  # gid: msg_id
+
+# ======================
+# HELPERS
+# ======================
+def today():
+    return datetime.now(WIB).strftime("%Y-%m-%d")
+
+def is_closed():
+    now = datetime.now(WIB)
+    return now.hour >= 18
+
+def format_absen(gid):
+    cur = db.cursor()
+    cur.execute("SELECT nama, status, alasan, waktu FROM absensi WHERE group_id=? AND tanggal=?", (gid, today()))
+    rows = cur.fetchall()
+
+    hadir = [r for r in rows if r[1] == "HADIR"]
+    izin  = [r for r in rows if r[1] == "IZIN"]
+    sakit = [r for r in rows if r[1] == "SAKIT"]
+
+    now = datetime.now(WIB)
+
+    list_text = ""
+    no = 1
+
+    for nama, _, _, waktu in hadir:
+        list_text += f"{no}. 🟢 {nama} (HADIR • {waktu})\n"
+        no += 1
+
+    for nama, _, alasan, waktu in izin:
+        list_text += f"{no}. 🟡 {nama} (IZIN • {alasan} • {waktu})\n"
+        no += 1
+
+    for nama, _, _, waktu in sakit:
+        list_text += f"{no}. 🔴 {nama} (SAKIT • {waktu})\n"
+        no += 1
+
+    status_close = "🔒 ABSEN DITUTUP" if is_closed() else "🟢 ABSEN DIBUKA"
+
+    return f"""
+🎀 *ABSENSI HARI INI*
+📅 {now.strftime("%A, %d %B %Y")}
+
+{status_close}
+
+🟢 Hadir: {len(hadir)}
+🟡 Izin: {len(izin)}
+🔴 Sakit: {len(sakit)}
+👥 Total: {len(rows)}
+
+────────────────────
+{list_text if list_text else "Belum ada yang absen."}
+────────────────────
+🛒 Store: @storegarf
+────────────────────
+"""
+
+async def update_absen(gid):
+    if gid not in absen_msg:
+        return
+
+    try:
+        await client.edit_message(
+            gid,
+            absen_msg[gid],
+            format_absen(gid),
+            buttons=[
+                [
+                    Button.inline("🟢 HADIR", b"hadir"),
+                    Button.inline("🟡 IZIN", b"izin"),
+                    Button.inline("🔴 SAKIT", b"sakit"),
+                ],
+                [
+                    Button.inline("📤 Export", b"export"),
+                    Button.inline("📊 Statistik", b"stat"),
+                ],
+                [
+                    Button.url("🛒 Store", "https://t.me/storegarf")
+                ]
+            ],
+            parse_mode="markdown"
+        )
+    except:
+        pass
+
+# ======================
+# START
+# ======================
+@client.on(events.NewMessage(pattern="/start"))
+async def start(event):
+    await event.respond(
+        "🔥 *BOT AUTO ABSEN*\nKlik tombol buat mulai.",
+        buttons=[
+            [Button.inline("🚀 MULAI", b"menu")]
+        ],
+        parse_mode="markdown"
+    )
+
+# ======================
+# ABSEN
+# ======================
+@client.on(events.NewMessage(pattern="/absen"))
+async def absen(event):
+    gid = event.chat_id
+
+    # unpin lama
+    try:
+        if gid in absen_msg:
+            await client.unpin_message(gid, absen_msg[gid])
+    except:
+        pass
+
+    msg = await event.respond(
+        format_absen(gid),
+        parse_mode="markdown"
+    )
+
+    absen_msg[gid] = msg.id
+
+    await update_absen(gid)
+
+    try:
+        await client.pin_message(gid, msg.id, notify=False)
+    except:
+        pass
+
+# ======================
+# CALLBACK
+# ======================
+@client.on(events.CallbackQuery)
+async def callback(event):
+    data = event.data.decode()
+    uid = event.sender_id
+    gid = event.chat_id
+    nama = (await event.get_sender()).first_name
+    now = datetime.now(WIB)
+
+    if data == "menu":
+        await event.respond("/absen")
+        return
+
+    if is_closed():
+        await event.answer("❌ Absen sudah ditutup!", alert=True)
+        return
+
+    cur.execute("SELECT * FROM absensi WHERE user_id=? AND tanggal=? AND group_id=?", (uid, today(), gid))
+    if cur.fetchone() and data not in ["export", "stat"]:
+        await event.answer("❗ Sudah absen!", alert=True)
+        return
+
+    if data == "hadir":
+        cur.execute("INSERT INTO absensi VALUES (?,?,?,?,?,?,?)",
+                    (gid, uid, nama, "HADIR", "", now.strftime("%H:%M"), today()))
+
+    elif data == "sakit":
+        cur.execute("INSERT INTO absensi VALUES (?,?,?,?,?,?,?)",
+                    (gid, uid, nama, "SAKIT", "Sakit", now.strftime("%H:%M"), today()))
+
+    elif data == "izin":
+        pending_izin[uid] = gid
+        await event.answer()
+        await event.respond("🟡 Kirim alasan izin:")
+        return
+
+    elif data == "export":
+        cur.execute("SELECT nama, status, waktu FROM absensi WHERE group_id=? AND tanggal=?", (gid, today()))
+        rows = cur.fetchall()
+
+        text = "\n".join([f"{n} - {s} - {w}" for n, s, w in rows])
+        file = f"absen-{today()}.txt"
+
+        with open(file, "w") as f:
+            f.write(text)
+
+        await client.send_file(gid, file)
+        return
+
+    elif data == "stat":
+        minggu = (datetime.now(WIB) - timedelta(days=7)).strftime("%Y-%m-%d")
+        cur.execute("SELECT tanggal, hadir, izin, sakit FROM rekap WHERE group_id=? AND tanggal>=?", (gid, minggu))
+        rows = cur.fetchall()
+
+        teks = "📊 *STATISTIK*\n\n"
+        for t, h, i, s in rows:
+            teks += f"{t} → 🟢 {h} 🟡 {i} 🔴 {s}\n"
+
+        await event.respond(teks, parse_mode="markdown")
+        return
+
+    db.commit()
+    await update_absen(gid)
+
+# ======================
+# IZIN TEXT
+# ======================
+@client.on(events.NewMessage)
+async def izin_handler(event):
+    uid = event.sender_id
+
+    if uid not in pending_izin:
+        return
+
+    gid = pending_izin[uid]
+    now = datetime.now(WIB)
+
+    cur.execute("INSERT INTO absensi VALUES (?,?,?,?,?,?,?)",
+                (gid, uid, event.sender.first_name, "IZIN", event.text, now.strftime("%H:%M"), today()))
+    db.commit()
+
+    del pending_izin[uid]
+
+    await update_absen(gid)
+
+# ======================
+# GET REKAP
+# ======================
+@client.on(events.NewMessage(pattern="/getrekap"))
+async def getrekap(event):
+    gid = event.chat_id
+
+    cur.execute("SELECT nama, status, alasan FROM absensi WHERE group_id=? AND tanggal=?", (gid, today()))
+    rows = cur.fetchall()
+
+    hadir = [r[0] for r in rows if r[1] == "HADIR"]
+    izin = [(r[0], r[2]) for r in rows if r[1] == "IZIN"]
+    sakit = [r[0] for r in rows if r[1] == "SAKIT"]
+
+    teks = f"📅 Rekap {today()}\n\n"
+
+    teks += f"🟢 Hadir ({len(hadir)}):\n"
+    teks += "\n".join(hadir) if hadir else "-"
+
+    teks += f"\n\n🟡 Izin ({len(izin)}):\n"
+    teks += "\n".join([f"{n} ({a})" for n, a in izin]) if izin else "-"
+
+    teks += f"\n\n🔴 Sakit ({len(sakit)}):\n"
+    teks += "\n".join(sakit) if sakit else "-"
+
+    teks += f"\n\n👥 Total: {len(rows)}"
+
+    await event.respond(teks)
+
+# ======================
+# RESET
+# ======================
+async def reset():
+    while True:
+        now = datetime.now(WIB)
+
+        if now.hour == 0 and now.minute == 0:
+            cur.execute("SELECT DISTINCT group_id FROM absensi")
+            groups = cur.fetchall()
+
+            for (gid,) in groups:
+                cur.execute("SELECT status FROM absensi WHERE group_id=?", (gid,))
+                rows = cur.fetchall()
+
+                hadir = len([r for r in rows if r[0] == "HADIR"])
+                izin = len([r for r in rows if r[0] == "IZIN"])
+                sakit = len([r for r in rows if r[0] == "SAKIT"])
+
+                cur.execute("INSERT INTO rekap VALUES (?,?,?,?,?)",
+                            (gid, today(), hadir, izin, sakit))
+
+                cur.execute("DELETE FROM absensi WHERE group_id=?", (gid,))
+                db.commit()
+
+                absen_msg.pop(gid, None)
+
+        await asyncio.sleep(30)
+
+# ======================
+# RUN
+# ======================
+async def main():
+    asyncio.create_task(reset())
+    print("BOT AKTIF 🔥")
+    await client.run_until_disconnected()
+
+with client:
+    client.loop.run_until_complete(main())
