@@ -158,15 +158,19 @@ async def absen(event):
     except:
         pass
 
-    msg = await event.respond(
+    # kirim pesan utama (WAJIB pakai send_message + gid)
+    msg = await client.send_message(
+        gid,
         format_absen(gid),
         parse_mode="markdown"
     )
 
     absen_msg[gid] = msg.id
 
+    # update button + list
     await update_absen(gid)
 
+    # pin pesan
     try:
         await client.pin_message(gid, msg.id, notify=False)
     except:
