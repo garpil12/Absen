@@ -1,4 +1,4 @@
-from telethon import events, Button
+        from telethon import events, Button
 import sqlite3, datetime
 
 db = sqlite3.connect("tmo.db", check_same_thread=False)
@@ -22,6 +22,7 @@ user_state = {}
 
 FIELDS_USER = ["host", "backup", "keliling"]
 FIELDS_TEXT = ["tagall", "gcast", "link"]
+ALL_FIELDS = FIELDS_USER + FIELDS_TEXT
 
 # ================= INIT =================
 def init_group(gid):
@@ -40,17 +41,25 @@ def get_data(gid):
     """, (gid,))
     return cur.fetchone() or ("", "", "", "", "", "")
 
+# ================= SAFE FIELD =================
 def get_field(gid, f):
-    cur.execute(f"SELECT {f} FROM jobdast WHERE group_id=?", (gid,))
-    r = cur.fetchone()
-    return safe(r[0]) if r else ""
+    if f not in ALL_FIELDS:
+        return ""
+    try:
+        cur.execute(f"SELECT {f} FROM jobdast WHERE group_id=?", (gid,))
+        r = cur.fetchone()
+        return safe(r[0]) if r else ""
+    except:
+        return ""
 
-# ================= FORMAT USER =================
+# ================= FORMAT =================
 def format_user(x):
     if not x:
         return "-"
     out = []
-    for v in [i for i in x.split("\n") if i.strip()]:
+    for v in x.split("\n"):
+        if not v.strip():
+            continue
         try:
             uid, name = v.split("|", 1)
             out.append(f"• [{name}](tg://user?id={uid})")
@@ -58,7 +67,6 @@ def format_user(x):
             out.append(f"• {v}")
     return "\n".join(out)
 
-# ================= FORMAT TEXT =================
 def format_text(x):
     if not x:
         return "-"
@@ -73,7 +81,6 @@ def add_text(old, text):
     text = text.strip()
     return text if not old else old + "\n" + text
 
-# ================= DATE =================
 def nice_date():
     return datetime.datetime.now().strftime("%A, %d %B %Y")
 
@@ -82,7 +89,7 @@ def build_copy_all(gid):
     h,b,k,t,g,l = get_data(gid)
 
     return f"""┏━━━━━━━━━━━━━━━━━━━━━━┓
-        ✨ 𝗝𝗢𝗕𝗗𝗘𝗞𝗦 𝗧𝗠𝗢 ✨
+✨ 𝗝𝗢𝗕𝗗𝗘𝗞𝗦 𝗧𝗠𝗢 ✨
 ┗━━━━━━━━━━━━━━━━━━━━━━┛
 
 🎙️ 𝗛𝗢𝗦𝗧
@@ -105,11 +112,6 @@ def build_copy_all(gid):
 
 🔗 𝗟𝗜𝗡𝗞
 {format_text(l)}
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-⚡ 𝗣𝗢𝗪𝗘𝗥 𝗕𝗬 @Brisik23
-🛍 𝗠𝘆 𝘀𝘁𝗼𝗿𝗲: @storegraf
 """
 
 def panel_text(gid):
@@ -118,22 +120,26 @@ def panel_text(gid):
 # ================= BUTTON =================
 def panel_btn(gid):
     return [
-        [Button.inline("🎙️ 𝗛𝗢𝗦𝗧", b"host"), Button.inline("🧨 DEL", b"reset_host")],
-        [Button.inline("🛡 𝙃𝙊𝙎𝙏 𝘽𝘼𝘾𝙆𝙐𝙋", b"backup"), Button.inline("🧨 DEL", b"reset_backup")],
-        [Button.inline("📍 𝗞𝗘𝗟𝗜𝗡𝗚", b"keliling"), Button.inline("🧨 DEL", b"reset_keliling")],
+        [Button.inline("HOST", b"host"), Button.inline("DEL", b"reset_host")],
+        [Button.inline("BACKUP", b"backup"), Button.inline("DEL", b"reset_backup")],
+        [Button.inline("KELILING", b"keliling"), Button.inline("DEL", b"reset_keliling")],
 
-        [Button.inline("📣 𝙏𝘼𝙂𝘼𝙇𝙇", b"tagall"), Button.inline("👁 PREVIEW", b"preview_tagall"), Button.inline("🧨 DEL", b"reset_tagall")],
-        [Button.inline("📡 𝙂𝘾𝘼𝙎𝙏", b"gcast"), Button.inline("👁 PREVIEW", b"preview_gcast"), Button.inline("🧨 DEL", b"reset_gcast")],
-        [Button.inline("🔗 𝙇𝙄𝙉𝙆", b"link"), Button.inline("👁 PREVIEW", b"preview_link"), Button.inline("🧨 DEL", b"reset_link")],
+        [Button.inline("TAGALL", b"tagall"), Button.inline("PREVIEW", b"preview_tagall"), Button.inline("DEL", b"reset_tagall")],
+        [Button.inline("GCAST", b"gcast"), Button.inline("PREVIEW", b"preview_gcast"), Button.inline("DEL", b"reset_gcast")],
+        [Button.inline("LINK", b"link"), Button.inline("PREVIEW", b"preview_link"), Button.inline("DEL", b"reset_link")],
 
-        [Button.inline("📋 𝘾𝙊𝙋𝙋𝙔  𝘼𝙇𝙇", b"copy_all")],
-        [Button.inline("🧨 𝙍𝙀𝙎𝙀𝙏 𝘼𝙇𝙇", b"reset_all")]
+        [Button.inline("COPY ALL", b"copy_all")],
+        [Button.inline("🧨 CLEAR FIELD ALL", b"clear_all")],
+        [Button.inline("RESET ALL", b"reset_all")]
     ]
 
 # ================= REFRESH =================
 async def refresh(client, gid):
-    if gid in panel_msg:
-        await panel_msg[gid].edit(panel_text(gid), buttons=panel_btn(gid))
+    try:
+        if gid in panel_msg:
+            await panel_msg[gid].edit(panel_text(gid), buttons=panel_btn(gid))
+    except:
+        pass
 
 # ================= HANDLER =================
 def register_jobdast_handlers(client):
@@ -146,26 +152,12 @@ def register_jobdast_handlers(client):
         msg = await event.reply(panel_text(gid), buttons=panel_btn(gid))
         panel_msg[gid] = msg
 
-    @client.on(events.NewMessage(pattern="/help"))
-    async def help_cmd(event):
-        await event.reply("""
-━━━━━━━━━━━━━━
-🔥 JOBDESK HELP
-
-• Klik tombol field
-• Reply ke bot untuk save
-• Preview = teks bersih
-• DEL = hapus data
-• COPY ALL = ambil semua
-━━━━━━━━━━━━━━
-""")
-
     # ================= CALLBACK =================
     @client.on(events.CallbackQuery)
     async def cb(ev):
         uid = ev.sender_id
         gid = ev.chat_id
-        data = ev.data.decode()
+        data = (ev.data or b"").decode().strip()
 
         user = await ev.get_sender()
         name = user.first_name or "User"
@@ -177,18 +169,19 @@ def register_jobdast_handlers(client):
             cur.execute(f"UPDATE jobdast SET {data}=? WHERE group_id=?", (new, gid))
             db.commit()
 
-            await ev.answer("ADDED USER ✅")
+            await ev.answer("ADDED USER")
             return await refresh(client, gid)
 
         if data in FIELDS_TEXT:
             user_state[(uid, gid)] = data
-            return await ev.answer("REPLY KE BOT SEKARANG", alert=True)
+            return await ev.answer("REPLY KE BOT")
 
         if data.startswith("preview_"):
             field = data.replace("preview_", "")
-            text = get_field(gid, field)
-            await ev.respond(format_text(text))
+            await ev.respond(format_text(get_field(gid, field)))
+            return
 
+        # RESET ALL
         if data == "reset_all":
             cur.execute("""
                 UPDATE jobdast SET host='',backup='',keliling='',
@@ -199,36 +192,26 @@ def register_jobdast_handlers(client):
             await ev.answer("RESET DONE")
             return await refresh(client, gid)
 
+        # CLEAR ALL (FIXED + SAFE)
+        if data == "clear_all":
+            cur.execute("""
+                UPDATE jobdast SET host='',backup='',keliling='',
+                tagall='',gcast='',link=''
+                WHERE group_id=?
+            """, (gid,))
+            db.commit()
+            await ev.answer("CLEARED ALL")
+            return await refresh(client, gid)
+
         if data.startswith("reset_"):
             f = data.replace("reset_", "")
-            cur.execute(f"UPDATE jobdast SET {f}='' WHERE group_id=?", (gid,))
-            db.commit()
-            await ev.answer(f"{f.upper()} DELETED")
+            if f in ALL_FIELDS:
+                cur.execute(f"UPDATE jobdast SET {f}='' WHERE group_id=?", (gid,))
+                db.commit()
+
+            await ev.answer("DELETED")
             return await refresh(client, gid)
 
         if data == "copy_all":
             await ev.respond(build_copy_all(gid))
 
-    # ================= FIX INPUT TEXT =================
-    @client.on(events.NewMessage)
-    async def input_text(event):
-        uid = event.sender_id
-        gid = event.chat_id
-
-        key = user_state.get((uid, gid))
-        if not key:
-            return
-
-        text = event.raw_text
-        old = get_field(gid, key)
-        new = add_text(old, text)
-
-        cur.execute(f"UPDATE jobdast SET {key}=? WHERE group_id=?", (new, gid))
-        db.commit()
-
-        user_state.pop((uid, gid))
-
-        await event.reply(f"{key.upper()} SAVED ✅")
-        await refresh(client, gid)
-
-print("BOT AKTIF 🔥")
