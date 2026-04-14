@@ -99,23 +99,24 @@ def build(gid, page=1):
         Button.inline("📦 PREVIEW ALL", "preview_all")
     ])
 
+    # 🔥 TAMBAHAN CLEAR ALL
+    buttons.append([
+        Button.inline("🧨 CLEAR ALL REKAB", "clear_all")
+    ])
+
     return text, buttons, total_page
+
 
 # ======================
 # REGISTER
 # ======================
 def register_rekab(client):
 
-    # ======================
-    # ADD REKAB (APPEND ONLY + DEBUG)
-    # ======================
+    # ADD REKAB
     @client.on(events.NewMessage(pattern="/addrekab"))
     async def addrekab(event):
         gid = event.chat_id
         raw = event.raw_text.replace("/addrekab", "").strip()
-
-        print(f"[DEBUG] /addrekab masuk group {gid}")
-        print(f"[DEBUG] RAW:\n{raw}")
 
         if not raw:
             await event.respond("❌ kosong")
@@ -130,13 +131,10 @@ def register_rekab(client):
 
             match = re.search(r"(https?://t\.me/\S+|@\w+)", line)
             if not match:
-                print(f"[SKIP] no link: {line}")
                 continue
 
             gc = match.group(1)
             nama = line.replace(gc, "").strip() or "UNKNOWN"
-
-            print(f"[INSERT] {nama} | {gc}")
 
             cur.execute(
                 "INSERT INTO rekab_tmo (group_id, nama, gc) VALUES (?,?,?)",
@@ -145,14 +143,9 @@ def register_rekab(client):
             count += 1
 
         db.commit()
-
-        print(f"[DEBUG] TOTAL INSERT: {count}")
-
         await event.respond(f"✅ REKAB MASUK: {count}")
 
-    # ======================
     # SHOW
-    # ======================
     @client.on(events.NewMessage(pattern="/rekab"))
     async def rekab(event):
         gid = event.chat_id
@@ -161,9 +154,7 @@ def register_rekab(client):
         msg = await event.respond(text, buttons=buttons)
         page_state[gid] = {"page": 1, "msg_id": msg.id}
 
-    # ======================
     # CALLBACK
-    # ======================
     @client.on(events.CallbackQuery())
     async def cb(event):
 
@@ -187,6 +178,15 @@ def register_rekab(client):
             elif data.startswith("del_"):
                 rid = int(data.split("_")[1])
                 cur.execute("DELETE FROM rekab_tmo WHERE id=?", (rid,))
+
+            # 🔥 CLEAR ALL
+            elif data == "clear_all":
+                cur.execute("DELETE FROM rekab_tmo WHERE group_id=?", (gid,))
+                db.commit()
+
+                await event.edit("🧨 SEMUA REKAB DIHAPUS")
+                await event.answer("CLEARED ✔️")
+                return
 
             elif data == "preview_all":
 
@@ -236,5 +236,4 @@ def register_rekab(client):
             await event.answer("UPDATED ✔️")
 
         except Exception as e:
-            print("[ERROR CALLBACK]", e)
             await event.answer(f"ERROR: {e}", alert=True)
