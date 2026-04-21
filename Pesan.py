@@ -8,22 +8,49 @@ QUOTES = [
 "🔥 Sᴀᴛᴜ-sᴀᴛᴜɴʏᴀ ᴋᴇsᴀʟᴀʜᴀɴ ᴀᴅᴀʟᴀʜ ᴛɪᴅᴀᴋ ʙᴇʟᴀᴊᴀʀ ᴅᴀʀɪɴʏᴀ.",
 "📖 Kᴀᴍᴜ ᴀᴅᴀʟᴀʜ ᴘᴇɴᴜʟɪs ʜɪᴅᴜᴘᴍᴜ sᴇɴᴅɪʀɪ.",
 "💭 Rᴀɢᴜ ʜᴀɴʏᴀ ᴍᴇɴᴜɴᴅᴀ ᴋᴇsᴜᴋsᴇsᴀɴ.",
+"📞 tiap hari callan, tapi kaga jadi jadian.",
+"🪐 malem yang indah saat berbincang dengan mu.",
+"👁️ pinter banget ngebohongnya udah ke dpr.",
 "⚡ Jᴀɴɢᴀɴ ᴛᴜɴɢɢᴜ ᴍᴏᴛɪᴠᴀsɪ, ʙᴜᴀᴛ ᴍᴏᴛɪᴠᴀsɪ ᴍᴜ sᴇɴᴅɪʀɪ.",
 "🚀 Hᴀʀɪ ɪɴɪ ᴀᴅᴀʟᴀʜ ʟᴀɴɢᴋᴀʜ ᴋᴇ ᴍᴀsᴀ ᴅᴇᴘᴀɴ.",
 "🧠 Yᴀɴɢ ᴍᴇᴍʙᴇᴅᴀᴋᴀɴ ᴀᴅᴀʟᴀʜ ᴛɪɴᴅᴀᴋᴀɴ, ʙᴜᴋᴀɴ ɴɪᴀᴛ.",
 "💪 Lᴇʟᴀʜ ɪᴛᴜ ᴡᴀᴊᴀʀ, ɴʏᴇʀᴀʜ ɪᴛᴜ ᴘɪʟɪʜᴀɴ.",
+"😏 Kamu itu unik, tiap mikir hasilnya selalu ‘error 404’.",
+"🙏 cie yang di balesnya sesuka hati, gimana hati masi kuat?",
 "🕊 Kᴇᴛᴇɴᴀɴɢᴀɴ ᴅᴀᴛᴀɴɢ ᴋᴇᴛɪᴋᴀ ᴋᴀᴍᴜ ʙᴇʀʜᴇɴᴛɪ ᴍᴇɴᴅᴇɴɢᴀʀᴋᴀɴ ᴅᴜɴɪᴀ.",
 "🌍 Mᴀɴᴜsɪᴀ ᴅɪ ᴄɪᴘᴛᴀᴋᴀɴ ᴅᴀʀɪ ᴛᴀɴᴀʜ, ʙᴜᴋᴀɴ ᴜɴᴛᴜᴋ ʙᴇʀsɪᴋᴀᴘ ʟᴇᴍᴀʜ.",
 "❤️ Hᴀʀɢᴀɪ ᴘʀᴏsᴇs, ʙᴜᴋᴀɴ ʜᴀsɪʟ sᴀᴊᴀ.",
 "🌟 Sᴇᴍᴜᴀ ᴏʀᴀɴɢ ᴘᴇʀɴᴀʜ ɢᴀɢᴀʟ, ᴛᴀᴘɪ ᴛɪᴅᴀᴋ sᴇᴍᴜᴀ ʙᴇʀʜᴇɴᴛɪ.",
 "🔥 Jᴀᴅɪʟᴀʜ ʟᴇʙɪʜ ᴅᴀʀɪ ᴋᴇᴍᴀʀɪɴ.",
+"💬 Janji kamu kayak iklan: menarik tapi nggak ada realisasinya.",
+"😂 Aura kamu itu kuat… kuat bikin orang sabar extra.",   
 "🌈 Sᴇᴛɪᴀᴘ ʜᴀʀɪ ᴀᴅᴀʟᴀʜ ᴘᴇʟᴜᴀɴɢ ʙᴀʀᴜ.",
 "💥 Kᴇʀᴊᴀ ᴋᴇʀᴀs ᴛɪᴅᴀᴋ ᴘᴇʀɴᴀʜ ᴍᴇmbᴏʜᴏɴɢɪ ʜᴀsɪʟ.",
 "🌙 Bᴇʟᴀᴊᴀʀ ᴅᴀʀɪ ᴋᴇɢᴀɢᴀʟᴀɴ.",
 "🧭 Jᴀɴɢᴀɴ ʜɪʟᴀɴɢ ᴀʀᴀʜ, ʜɪʟᴀɴɢᴋᴀɴ ᴋᴇʀᴀɢᴜᴀɴ.",
 "⚔️ Hɪᴅᴜᴘ ᴀᴅᴀʟᴀʜ ᴘᴇʀᴊᴜᴀɴɢᴀɴ.",
 "🏆 Sᴜᴋsᴇs ᴅɪᴍᴜʟᴀɪ ᴅᴀʀɪ ᴋᴇʙɪᴀsᴀᴀɴ ᴋᴇᴄɪʟ.",
-
+# ================= CANDaan KODE KERAS SANTAI =================
+"😂 Aku bukan second choice, aku lagi mode hemat energi aja.",
+"🧠 Kalau aku dianggap cadangan, berarti aku memang terlalu berkualitas buat dipakai sembarangan.",
+"📍 Aku bukan backburner, aku cuma lagi OFF dulu dari drama.",
+"🔥 Yang serius aja belum tentu cocok, apalagi yang setengah-setengah.",
+"😌 Aku bukan pilihan kedua, aku cuma lagi nunggu yang pasti.",
+"💬 Kalau aku diabaikan, tenang… aku juga bisa lupa balik.",
+"🚪 Aku nggak ditinggal, aku cuma keluar tanpa pamit tambahan.",
+"🧊 Aku dingin bukan karena sakit hati, tapi karena udah paham situasi.",
+"📉 Ekspektasi turun = hidup makin tenang.",
+"🕰 Aku tidak nunggu siapa-siapa, aku cuma lewat waktu aja.",
+"😏 Jangan jadikan aku cadangan, aku bisa upgrade jadi hilang permanen.",
+"🧠 Kalau aku diam, bukan berarti nggak sadar.",
+"📵 Aku bukan pilihan, aku seleksi alam.",
+"🖤 Aku tidak tersingkir, aku memilih tidak ikut lomba yang tidak jelas.",
+"⚡ Aku bisa jadi penting… tapi juga bisa jadi asing lagi.",
+"🚶 Kalau aku pergi, itu bukan kalah… itu selesai.",
+"🌙 Aku bukan prioritasmu? santai, kamu juga bukan deadline-ku.",
+"🧃 Aku bukan second choice, aku cuma lagi mode ‘nggak peduli dulu’.",
+"📌 Aku tahu posisiku, makanya aku nggak maksa.",
+"😌 Hidup terlalu singkat buat jadi opsi cadangan orang lain."
 # ================= TAMBAHAN =================
 "🌿 Tᴇɴᴀɴɢ ʙᴜᴋᴀɴ ʙᴇʀᴀʀᴛɪ ʟᴇᴍᴀʜ.",
 "⚡ Sᴇᴘᴇʀᴛɪ ʟɪsᴛʀɪᴋ, ᴋᴇᴄɪʟ ᴛᴀᴘɪ ʙᴇʀᴅᴀᴍᴘᴀᴋ.",
@@ -57,6 +84,8 @@ QUOTES = [
 "🔥 Jᴀᴅɪʟᴀʜ ᴘᴇɴᴇʀᴀɴɢ.",
 "🌈 Kᴇʙᴀʜᴀɢɪᴀᴀɴ ᴅɪ ᴅɪʀɪ.",
 "🧭 Jᴀʟᴀɴɪ ᴘʀᴏsᴇs.",
+"😂 Katanya sayang, tapi balas chat aja pakai musim.",
+ "😌 Kamu datang kayak hujan, tapi cuma netes sebentar lalu hilang.",
 "💪 Kᴇʙᴇʀʜᴀsɪʟᴀɴ ᴅɪᴍᴜʟᴀɪ ᴋᴇɴᴇᴋᴀᴛᴀɴ.",
 "🌍 Tɪᴅᴀᴋ ᴀᴅᴀ ʙᴀᴛᴀs ʜɪᴅᴜᴘ.",
 "🔥 Jᴀɴɢᴀɴ ʙᴇʀʜᴇɴᴛɪ ᴍᴇɴᴄᴏʙᴀ.",
@@ -115,7 +144,6 @@ QUOTES = [
 "⏳ Waktu tidak menyembuhkan, hanya membiasakan.",
 "🌧 Hujan paling jujur adalah yang turun tanpa suara.",
 "💬 Aku diam bukan berarti lupa.",
-
 "🧠 Kode keras: jangan berharap dari yang sudah pergi.",
 "⚠️ Tidak semua yang datang akan tinggal.",
 "🔐 Jangan buka hati untuk orang yang pernah menutupmu.",
@@ -127,7 +155,8 @@ QUOTES = [
 "🧨 Jangan letakkan kebahagiaan di tangan orang lain.",
 "🧭 Kalau dia mau, dia akan tetap tinggal.",
 "🕳 Jangan jatuh di lubang yang sama dua kali.",
-
+"💬 Jangan terlalu serius berharap, nanti kamu yang kena typo perasaan.", 
+    "🧠 Berharap itu gratis, tapi jangan sampai bikin kamu menangis.",
 "💔 Aku belajar bahwa kehilangan itu juga bentuk pelajaran.",
 "🌫 Kadang yang pergi bukan karena benci, tapi karena lelah.",
 "🖤 Aku kangen, tapi aku juga harus waras.",
@@ -140,5 +169,14 @@ QUOTES = [
 "🌙 Aku sudah terbiasa sendiri, bahkan saat ramai."
 ]
 
+# ================= RANDOM SYSTEM ANTI NGULANG ================
+
+_pool = QUOTES.copy()
+random.shuffle(_pool)
+
 def get_quote():
-    return random.choice(QUOTES)
+    global _pool
+    if not _pool:
+        _pool = QUOTES.copy()
+        random.shuffle(_pool)
+    return _pool.pop()
