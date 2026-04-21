@@ -98,6 +98,15 @@ def format_absen(gid):
 
     status_close = "🔒 ABSEN DITUTUP" if is_closed() else "🟢 ABSEN DIBUKA"
 
+    # ======================
+    # 🔥 MOTIVASI DARI pesan.py (RANDOM SETIAP CALL)
+    # ======================
+    try:
+        import pesan
+        motivasi = pesan.get_quote()
+    except:
+        motivasi = "Tetap semangat, jangan menyerah."
+
     return f"""
 🎀 *ABSENSI HARI INI*
 📅 {now.strftime("%A, %d %B %Y")}
@@ -112,8 +121,9 @@ def format_absen(gid):
 ────────────────────
 {list_text if list_text else "Belum ada yang absen."}
 ────────────────────
-🛒 Store: @storegarf
-────────────────────
+💬 MOTIVASI:
+
+"{motivasi}"
 """
 
 async def update_absen(gid):
